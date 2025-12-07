@@ -1,3 +1,5 @@
+import 'package:raylib/raylib.dart' as rl;
+
 enum Axis2 {
 	x,
 	y;
@@ -53,12 +55,24 @@ class Grid2<T> {
 class Vector2<T> {
 	final Map<Axis2, T> _data;
 
-	Vector2(T x, T y) : _data = {Axis2.x: x, Axis2.y: y};
+	Vector2(T x, T y) : _data = { Axis2.x: x, Axis2.y: y };
+	Vector2.zero() : _data = { Axis2.x: 0 as T, Axis2.y: 0 as T };
 
 	T get x => _data[Axis2.x] as T;
 	T get y => _data[Axis2.y] as T;
 
 	T getAxis(Axis2 axis) => _data[axis] as T;
+
+	@override
+	bool operator ==(Object other) {
+		return identical(this, other) ||
+			other is Vector2<T> &&
+			other.x == x &&
+			other.y == y;
+	}
+
+	@override
+	int get hashCode => Object.hash(x, y);
 
 	Vector2<U> apply<U>(U Function(T, Axis2) transform) {
 		return Vector2(

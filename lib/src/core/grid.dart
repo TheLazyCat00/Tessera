@@ -1,6 +1,9 @@
+import 'package:tessera/src/core/rendering.dart';
 import 'package:tessera/src/types/aliases.dart';
 import 'package:tessera/src/types/blueprints.dart';
 import 'package:tessera/src/types/helpers.dart';
+import 'package:raylib/raylib.dart' as rl;
+
 
 class Grid {
 	Grid2<SizeCallback> grid;
@@ -8,12 +11,15 @@ class Grid {
 	Dimension2<Pixel> dimensions = Dimension2(0, 0);
 	Grid(this.grid);
 
-	void addWidget(Widget widget) {
-		widgets.add(widget);
+	Grid addWidgets(List<Widget> newWidgets) {
+		widgets.addAll(newWidgets);
+
+		return this;
 	}
 
-	RgbaSurface render(RenderContext renderContext) {
+	void render(rl.RenderTexture2D buffer, RenderContext renderContext) {
 		dimensions = renderContext.dimensions;
+
 		final context = (dimensions: dimensions);
 
 		final absoluteGrid = grid.accumulate(
@@ -22,9 +28,11 @@ class Grid {
 			(a, b) => a + b,
 		);
 
-		RgbaSurface surface = RgbaSurface(dimensions);
 
-		for (var widget in widgets) {
+		// Sort widgets by zIndex (lower zIndex rendered first, higher on top)
+		final sortedWidgets = [...widgets]..sort((a, b) => a.zIndex.compareTo(b.zIndex));
+
+		for (var widget in sortedWidgets) {
 			var topLeft = widget.topLeft.apply((cell, axis) {
 				return absoluteGrid.getAxis(axis)[cell];
 			});
@@ -33,10 +41,13 @@ class Grid {
 				return absoluteGrid.getAxis(axis)[cell + 1];
 			});
 
-			var widgetSurface = widget.renderCallback((dimensions: bottomRight - topLeft));
-			surface.insertSurface(topLeft, widgetSurface);
-		}
+			var widgetBuffer = widget.renderCallback((
+				dimensions: bottomRight - topLeft
+			));
 
-		return surface;
+			rl.beginTextureMode(buffer);
+			drawBuffer(widgetBuffer, topLeft);
+			rl.endTextureMode();
+		}
 	}
 }

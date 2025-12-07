@@ -1,4 +1,5 @@
 import 'package:tessera/tessera.dart';
+import 'package:raylib/raylib.dart' as rl hide Vector2;
 
 Grid2<SizeCallback> evenGrid(Grid2<int> grid) {
 	var proportional = grid.apply((element, axis) {
@@ -17,29 +18,59 @@ Grid2<SizeCallback> evenGrid(Grid2<int> grid) {
 }
 
 void main() {
-	var layout = evenGrid(Grid2([1, 1, 1], [1, 1, 1]));
-	var grid = Grid(layout);
+	rl.initLibrary(windows: getRaylibPath());
+	rl.initWindow(800, 600, "Hello Raylib!");
 
-	Widget widget = (topLeft: Vector2(0, 0), bottomRight: Vector2(2, 2), renderCallback: (renderContext) {
-		var res = RgbaSurface(renderContext.dimensions);
-		res.fill(0xFFAA00FF);
+	var grid = Grid(evenGrid(Grid2([1], [1, 1])));
 
-		return res;
-	});
-
-	grid.addWidget(widget);
+	grid.addWidgets([
+		Widget(
+			Vector2(0, 0),
+			Vector2(0, 0),
+			Grid(evenGrid(Grid2([1], [1, 1])))
+			.addWidgets([
+				Widget(
+					Vector2(0, 0),
+					Vector2(0, 0),
+					(buffer, renderContext) {
+						rl.beginTextureMode(buffer);
+						rl.drawRectangle(0, 0, renderContext.dimensions.x, renderContext.dimensions.y, rl.Color.blue);
+						rl.endTextureMode();
+					}
+				),
+				Widget(
+					Vector2(0, 1),
+					Vector2(0, 1),
+					(buffer, renderContext) {
+						rl.beginTextureMode(buffer);
+						rl.drawRectangle(0, 0, renderContext.dimensions.x, renderContext.dimensions.y, rl.Color.red);
+						rl.endTextureMode();
+					}
+				),
+			]).render
+		),
+		Widget(
+			Vector2(0, 1),
+			Vector2(0, 1),
+			(buffer, renderContext) {
+				rl.beginTextureMode(buffer);
+				rl.drawRectangle(0, 0, renderContext.dimensions.x, renderContext.dimensions.y, rl.Color.orange);
+				rl.endTextureMode();
+			}
+		),
+	]);
 
 	var dimension = Dimension2(800, 600);
-	var pixelRenderer = PixelRenderer(RgbaSurface(dimension)); // Initial surface
+	var gridWidget = Widget(
+		Vector2.zero(),
+		Vector2.zero(),
+		grid.render,
+	);
 
-	while (!pixelRenderer.shouldClose()) {
-		// Re-render grid each frame
-		var surface = grid.render((dimensions: dimension));
-		
-		// Update renderer's surface and display
-		pixelRenderer.surface = surface;
-		pixelRenderer.render();
+	while (!rl.windowShouldClose()) {
+		renderWidget(gridWidget, dimension);
 	}
 
-	pixelRenderer.cleanup();
+
+	rl.closeWindow();
 }
