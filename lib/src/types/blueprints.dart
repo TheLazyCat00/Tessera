@@ -3,7 +3,7 @@ import 'package:tessera/src/types.dart';
 
 typedef RenderCallback = void Function(rl.RenderTexture2D buffer, RenderContext renderContext);
 typedef RenderContext = ({
-	Area<Pixel> area
+	Area<Pixel> area,
 });
 
 typedef SizeCallback = Pixel Function(SizeContext sizeContext);
@@ -27,21 +27,25 @@ class Border<T> {
 
 class Widget {
 	Area<Cell> area;
-	late rl.RenderTexture2D Function(RenderContext renderContext) renderCallback;
+	late rl.RenderTexture2D Function(RenderContext) renderCallback;
 	int zIndex;
 
-	RenderContext? _prevRenderContext;
+	RenderContext? _prevRenderCallContext;
 	late rl.RenderTexture2D _buffer;
 
 	Widget(this.area, RenderCallback renderCallback, { this.zIndex = 0 }) {
-		this.renderCallback = ((RenderContext renderContext) {
-			if (_prevRenderContext != renderContext) {
+		this.renderCallback = ((renderContext) {
+			if (_prevRenderCallContext != renderContext) {
 				_buffer = rl.loadRenderTexture(renderContext.area.getDimensions().x, renderContext.area.getDimensions().y);
 			}
 
-			renderCallback(_buffer, renderContext);
+			rl.beginTextureMode(_buffer);
+			rl.clearBackground(rl.Color.rayWhite);
+			rl.endTextureMode();
 
-			_prevRenderContext = renderContext;
+			renderCallback(_buffer, (area: renderContext.area));
+
+			_prevRenderCallContext = renderContext;
 			return _buffer;
 		});
 	}

@@ -3,12 +3,11 @@ import 'package:raylib/raylib.dart' as rl;
 import 'dart:io';
 
 
-void renderWidget(Widget widget, Dimension2<Pixel> dimensions) {
-	Area<Pixel> area = Area(Vector2.zero(), dimensions);
+void renderWidget(Widget widget) {
+	Area<Pixel> area = Area(Vector2.zero(), Vector2(rl.getScreenWidth(), rl.getScreenHeight()));
 	var buffer = widget.renderCallback((area: area));
 
 	rl.beginDrawing();
-	rl.clearBackground(rl.Color.rayWhite);
 	drawBuffer(buffer, Vector2(0, 0));
 	rl.endDrawing();
 }

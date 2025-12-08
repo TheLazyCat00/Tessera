@@ -15,6 +15,12 @@ enum Axis2 {
 	}
 }
 
+T convert<T extends num>(num value) {
+	if (T == double) return value.toDouble() as T;
+	if (T == int) return value.toInt() as T;
+	throw UnsupportedError("Unsupported type $T");
+}
+
 class Grid2<T> {
 	final Map<Axis2, List<T>> _data;
 
@@ -74,6 +80,19 @@ class Area<T extends num> {
 	int get hashCode => Object.hash(topLeft, bottomRight);
 
 	Dimension2<T> getDimensions() => bottomRight - topLeft;
+
+	void scale(double factor) {
+		var middlePoint = (topLeft + bottomRight) / 2;
+		var distance = middlePoint - topLeft;
+		distance = distance * factor;
+
+		topLeft = middlePoint - distance;
+		bottomRight = middlePoint + distance;
+	}
+
+	Area<T> toRelative() {
+		return Area(Vector2.zero(), bottomRight - topLeft);
+	}
 }
 
 extension RaylibVector2ToTesseraVector2 on rl.Vector2 {
@@ -135,19 +154,11 @@ class Vector2<T extends num> {
 		return Vector2<T>(x - ox, y - oy);
 	}
 
-	Vector2<T> operator *(Vector2<T> other) {
-		dynamic x = this.x;
-		dynamic y = this.y;
-		dynamic ox = other.x;
-		dynamic oy = other.y;
-		return Vector2<T>(x * ox, y * oy);
+	Vector2<T> operator * (num value) {
+		return Vector2(convert<T>(x * value), convert<T>(y * value));
 	}
 
-	Vector2<T> operator /(Vector2<T> other) {
-		dynamic x = this.x;
-		dynamic y = this.y;
-		dynamic ox = other.x;
-		dynamic oy = other.y;
-		return Vector2<T>(x / ox, y / oy);
+	Vector2<T> operator / (num value) {
+		return Vector2(convert<T>(x / value), convert<T>(y / value));
 	}
 }
