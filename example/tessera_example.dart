@@ -63,7 +63,6 @@ void main() {
 		),
 	]);
 
-	var dimension = Dimension2(800, 600);
 	var gridWidget = Widget(
 		Area.zero(),
 		grid.render,

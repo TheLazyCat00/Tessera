@@ -11,6 +11,35 @@ typedef SizeContext = ({
 	Dimension2<Pixel> dimensions
 });
 
+typedef AnimationCallback = double Function();
+
+class Animation {
+	double _time;
+	double _value;
+	double _timeSinceUpdate;
+
+	Animation(this._value, this._time):
+		_timeSinceUpdate = rl.getTime();
+
+	void setValue(double value) {
+		if (_value == value) return;
+
+		_value = value;
+		_timeSinceUpdate = rl.getTime();
+	}
+
+	void setTime(double time) {
+		if (_time == _time) return;
+
+		_time = time;
+		_timeSinceUpdate = rl.getTime();
+	}
+
+	AnimationCallback getValue = () {
+		return "hi";
+	}
+}
+
 class Border<T> {
 	T top;
 	T left;
