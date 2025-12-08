@@ -1,7 +1,4 @@
-import 'package:tessera/src/core/rendering.dart';
-import 'package:tessera/src/types/aliases.dart';
-import 'package:tessera/src/types/blueprints.dart';
-import 'package:tessera/src/types/helpers.dart';
+import 'package:tessera/tessera.dart';
 import 'package:raylib/raylib.dart' as rl;
 
 
@@ -18,7 +15,7 @@ class Grid {
 	}
 
 	void render(rl.RenderTexture2D buffer, RenderContext renderContext) {
-		dimensions = renderContext.dimensions;
+		dimensions = renderContext.area.getDimensions();
 
 		final context = (dimensions: dimensions);
 
@@ -33,16 +30,17 @@ class Grid {
 		final sortedWidgets = [...widgets]..sort((a, b) => a.zIndex.compareTo(b.zIndex));
 
 		for (var widget in sortedWidgets) {
-			var topLeft = widget.topLeft.apply((cell, axis) {
+			var topLeft = widget.area.topLeft.apply((cell, axis) {
 				return absoluteGrid.getAxis(axis)[cell];
 			});
 
-			var bottomRight = widget.bottomRight.apply((cell, axis) {
+			var bottomRight = widget.area.bottomRight.apply((cell, axis) {
 				return absoluteGrid.getAxis(axis)[cell + 1];
 			});
 
+			var area = Area(topLeft, bottomRight);
 			var widgetBuffer = widget.renderCallback((
-				dimensions: bottomRight - topLeft
+				area: area
 			));
 
 			rl.beginTextureMode(buffer);

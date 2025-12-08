@@ -25,36 +25,44 @@ void main() {
 
 	grid.addWidgets([
 		Widget(
-			Vector2(0, 0),
-			Vector2(0, 0),
+			Area(Vector2(0, 0), Vector2(0, 0)),
 			Grid(evenGrid(Grid2([1], [1, 1])))
 			.addWidgets([
 				Widget(
-					Vector2(0, 0),
-					Vector2(0, 0),
+					Area(Vector2(0, 0), Vector2(0, 0)),
 					(buffer, renderContext) {
+						var dimensions = renderContext.area.getDimensions();
+
 						rl.beginTextureMode(buffer);
-						rl.drawRectangle(0, 0, renderContext.dimensions.x, renderContext.dimensions.y, rl.Color.blue);
+						var color = rl.Color.blue;
+
+						if (rl.getMousePosition().toTessera().isInside(renderContext.area)){
+							color = rl.Color.magenta;
+						}
+
+						rl.drawRectangle(0, 0, dimensions.x, dimensions.y, color);
 						rl.endTextureMode();
 					}
 				),
 				Widget(
-					Vector2(0, 1),
-					Vector2(0, 1),
+					Area(Vector2(0, 1), Vector2(0, 1)),
 					(buffer, renderContext) {
+						var dimensions = renderContext.area.getDimensions();
+
 						rl.beginTextureMode(buffer);
-						rl.drawRectangle(0, 0, renderContext.dimensions.x, renderContext.dimensions.y, rl.Color.red);
+						rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.red);
 						rl.endTextureMode();
 					}
 				),
 			]).render
 		),
 		Widget(
-			Vector2(0, 1),
-			Vector2(0, 1),
+			Area(Vector2(0, 1), Vector2(0, 1)),
 			(buffer, renderContext) {
+				var dimensions = renderContext.area.getDimensions();
+
 				rl.beginTextureMode(buffer);
-				rl.drawRectangle(0, 0, renderContext.dimensions.x, renderContext.dimensions.y, rl.Color.orange);
+				rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.orange);
 				rl.endTextureMode();
 			}
 		),
@@ -62,8 +70,7 @@ void main() {
 
 	var dimension = Dimension2(800, 600);
 	var gridWidget = Widget(
-		Vector2.zero(),
-		Vector2.zero(),
+		Area.zero(),
 		grid.render,
 	);
 

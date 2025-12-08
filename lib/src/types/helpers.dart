@@ -1,4 +1,5 @@
 import 'package:raylib/raylib.dart' as rl;
+import 'package:tessera/src/types.dart';
 
 enum Axis2 {
 	x,
@@ -52,7 +53,34 @@ class Grid2<T> {
 	}
 }
 
-class Vector2<T> {
+class Area<T extends num> {
+	Vector2<T> topLeft;
+	Vector2<T> bottomRight;
+
+	Area(this.topLeft, this.bottomRight);
+	Area.zero() :
+		topLeft = Vector2.zero(),
+		bottomRight = Vector2.zero();
+
+	@override
+	bool operator ==(Object other) {
+		return identical(this, other) ||
+			other is Area<T> &&
+			other.topLeft == topLeft &&
+			other.bottomRight == bottomRight;
+	}
+
+	@override
+	int get hashCode => Object.hash(topLeft, bottomRight);
+
+	Dimension2<T> getDimensions() => bottomRight - topLeft;
+}
+
+extension RaylibVector2ToTesseraVector2 on rl.Vector2 {
+	Vector2 toTessera() => Vector2(x, y);
+}
+
+class Vector2<T extends num> {
 	final Map<Axis2, T> _data;
 
 	Vector2(T x, T y) : _data = { Axis2.x: x, Axis2.y: y };
@@ -60,8 +88,6 @@ class Vector2<T> {
 
 	T get x => _data[Axis2.x] as T;
 	T get y => _data[Axis2.y] as T;
-
-	T getAxis(Axis2 axis) => _data[axis] as T;
 
 	@override
 	bool operator ==(Object other) {
@@ -74,7 +100,19 @@ class Vector2<T> {
 	@override
 	int get hashCode => Object.hash(x, y);
 
-	Vector2<U> apply<U>(U Function(T, Axis2) transform) {
+	rl.Vector2 toRaylib() => rl.Vector2(x.toDouble(), y.toDouble());
+
+	T getAxis(Axis2 axis) => _data[axis] as T;
+
+	bool isInside(Area<T> area) {
+		return
+			area.topLeft.x < x &&
+			area.topLeft.y < y &&
+			x < area.bottomRight.x &&
+			y < area.bottomRight.y;
+	}
+
+	Vector2<U> apply<U extends num>(U Function(T, Axis2) transform) {
 		return Vector2(
 			transform(x, Axis2.x),
 			transform(y, Axis2.y),

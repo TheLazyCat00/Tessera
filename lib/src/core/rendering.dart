@@ -1,12 +1,11 @@
-import 'package:tessera/src/types/aliases.dart';
-import 'package:tessera/src/types/blueprints.dart';
-import 'package:tessera/src/types/helpers.dart';
+import 'package:tessera/src/types.dart';
 import 'package:raylib/raylib.dart' as rl;
 import 'dart:io';
 
 
 void renderWidget(Widget widget, Dimension2<Pixel> dimensions) {
-	var buffer = widget.renderCallback((dimensions: dimensions));
+	Area<Pixel> area = Area(Vector2.zero(), dimensions);
+	var buffer = widget.renderCallback((area: area));
 
 	rl.beginDrawing();
 	rl.clearBackground(rl.Color.rayWhite);
@@ -25,7 +24,7 @@ void drawBuffer(rl.RenderTexture2D buffer, Vector2<Pixel> position) {
 		- textureHeight,
 	);
 
-	rl.drawTextureRec(buffer.texture, source, rl.Vector2(position.x.toDouble(), position.y.toDouble()), rl.Color.white);
+	rl.drawTextureRec(buffer.texture, source, position.toRaylib(), rl.Color.white);
 }
 
 String getRaylibPath() {
