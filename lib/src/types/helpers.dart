@@ -90,6 +90,17 @@ class Area<T extends num> {
 		bottomRight = middlePoint + distance;
 	}
 
+	rl.Rectangle toRaylib() {
+		var dimensions = getDimensions();
+
+		return rl.Rectangle(
+			topLeft.x.toDouble(),
+			topLeft.y.toDouble(),
+			dimensions.x.toDouble(),
+			dimensions.y.toDouble()
+		);
+	}
+
 	Area<T> toRelative() {
 		return Area(Vector2.zero(), bottomRight - topLeft);
 	}

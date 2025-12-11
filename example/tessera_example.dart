@@ -24,7 +24,6 @@ void main() {
 
 	var grid = Grid(evenGrid(Grid2([1], [1, 1])));
 
-	var scale = Animation(1, 1, ease);
 	grid.addWidgets([
 		Widget(
 			Area(Vector2(0, 0), Vector2(0, 0)),
@@ -32,26 +31,33 @@ void main() {
 			.addWidgets([
 				Widget(
 					Area(Vector2(0, 0), Vector2(0, 0)),
-					(buffer, renderContext) {
-						rl.beginTextureMode(buffer);
+					(() {
+						var scale = Animation(1, 0.2, ease);
+						var roundness = Animation(0, 0.2, ease);
 
-						var area = renderContext.area.toRelative();
-						if (rl.getMousePosition().toTessera().isInside(renderContext.area) && rl.isCursorOnScreen()) {
-							scale.setValue(0.5);
-						}
-						else {
-							scale.setValue(1);
-						}
+						return (buffer, renderContext) {
+							rl.beginTextureMode(buffer);
 
-						area.scale(scale.getValue());
+							var area = renderContext.area.toRelative();
+							if (rl.getMousePosition().toTessera().isInside(renderContext.area) && rl.isCursorOnScreen()) {
+								scale.setValue(0.5);
+								roundness.setValue(0.5);
+							}
+							else {
+								scale.setValue(1);
+								roundness.setValue(0);
+							}
 
-						rl.drawRectangle(area.topLeft.x, area.topLeft.y, area.getDimensions().x, area.getDimensions().y, rl.Color.yellow);
-						rl.endTextureMode();
-					}
+							area.scale(scale.getValue());
+
+							rl.drawRectangleRounded(area.toRaylib(), roundness.getValue(), 5, rl.Color.yellow);
+							rl.endTextureMode();
+						};
+					})()
 				),
 				Widget(
 					Area(Vector2(0, 1), Vector2(0, 1)),
-					(buffer, renderContext) {
+				(buffer, renderContext) {
 						var dimensions = renderContext.area.getDimensions();
 
 						rl.beginTextureMode(buffer);
