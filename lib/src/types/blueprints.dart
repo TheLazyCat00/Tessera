@@ -16,7 +16,6 @@ typedef SizeContext = ({
 typedef AnimationFunc = double Function(double progressRatio);
 
 class Animation {
-	// double _duration;
 	double _duration;
 	double _to;
 	double _from;
