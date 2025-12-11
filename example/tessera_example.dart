@@ -18,8 +18,13 @@ Grid2<SizeCallback> evenGrid(Grid2<int> grid) {
 }
 
 void main() {
+	rl.initLibrary(windows: getRaylibPath());
+	rl.initWindow(800, 600, "Hello Raylib!");
+	rl.setWindowState(rl.ConfigFlags.windowResizable);
+
 	var grid = Grid(evenGrid(Grid2([1], [1, 1])));
 
+	var scale = Animation(1, 1, ease);
 	grid.addWidgets([
 		Widget(
 			Area(Vector2(0, 0), Vector2(0, 0)),
@@ -32,8 +37,13 @@ void main() {
 
 						var area = renderContext.area.toRelative();
 						if (rl.getMousePosition().toTessera().isInside(renderContext.area) && rl.isCursorOnScreen()) {
-							area.scale(0.5);
+							scale.setValue(0.5);
 						}
+						else {
+							scale.setValue(1);
+						}
+
+						area.scale(scale.getValue());
 
 						rl.drawRectangle(area.topLeft.x, area.topLeft.y, area.getDimensions().x, area.getDimensions().y, rl.Color.yellow);
 						rl.endTextureMode();
@@ -67,10 +77,6 @@ void main() {
 		Area.zero(),
 		grid.render,
 	);
-
-	rl.initLibrary(windows: getRaylibPath());
-	rl.initWindow(800, 600, "Hello Raylib!");
-	rl.setWindowState(rl.ConfigFlags.windowResizable);
 
 	while (!rl.windowShouldClose()) {
 		renderWidget(gridWidget);
