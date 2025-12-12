@@ -49,3 +49,26 @@ class Grid {
 		}
 	}
 }
+
+class Knob {
+	SizeCallback radius;
+	double ratio = 0;
+	rl.Color color;
+	double min;
+	double max;
+
+	Knob(this.radius, this.color, this.min, this.max);
+
+	void render (rl.RenderTexture2D buffer, RenderContext renderContext) {
+		var relativeArea = renderContext.area.toRelative();
+		var center = relativeArea.getCenter();
+		rl.drawCircleV(
+			center.toRaylib(),
+			radius((dimensions: relativeArea.getDimensions())).toDouble(),
+			color
+		);
+
+		var diff = max - min;
+		rl.drawText((min + diff * ratio).toString(), center.x, center.y, 1, color);
+	}
+}

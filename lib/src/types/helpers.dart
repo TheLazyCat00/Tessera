@@ -104,6 +104,8 @@ class Area<T extends num> {
 	Area<T> toRelative() {
 		return Area(Vector2.zero(), bottomRight - topLeft);
 	}
+
+	Vector2<T> getCenter() => bottomRight - getDimensions() / 2;
 }
 
 extension RaylibVector2ToTesseraVector2 on rl.Vector2 {
