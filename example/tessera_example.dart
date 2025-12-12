@@ -22,65 +22,75 @@ void main() {
 	rl.initWindow(800, 600, "Hello Raylib!");
 	rl.setWindowState(rl.ConfigFlags.windowResizable);
 
+
+	var animationWidget = Widget((() {
+		var scale = Animation(1, 0.2, ease);
+		var roundness = Animation(0, 0.2, ease);
+
+		return (buffer, renderContext) {
+			rl.beginTextureMode(buffer);
+
+			var area = renderContext.area.toRelative();
+			if (rl.getMousePosition().toTessera().isInside(renderContext.area) && rl.isCursorOnScreen()) {
+				scale.setValue(0.5);
+				roundness.setValue(0.5);
+			}
+			else {
+				scale.setValue(1);
+				roundness.setValue(0);
+			}
+
+			area.scale(scale.getValue());
+
+			rl.drawRectangleRounded(area.toRaylib(), roundness.getValue(), 5, rl.Color.yellow);
+			rl.endTextureMode();
+		};
+	})());
+
+	var idk1 = Widget(
+		Grid(evenGrid(Grid2([1], [1, 1])))
+		.addWidgets([
+			(
+				area: Area(Vector2(0, 0), Vector2(0, 0)),
+				widget: animationWidget
+			),
+			(
+				area: Area(Vector2(0, 1), Vector2(0, 1)),
+				widget: Widget((buffer, renderContext) {
+					var dimensions = renderContext.area.getDimensions();
+
+					rl.beginTextureMode(buffer);
+					rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.red);
+					rl.endTextureMode();
+				})
+			),
+		]).render
+	);
+
+	var idk2 = Widget(
+		(buffer, renderContext) {
+			var dimensions = renderContext.area.getDimensions();
+
+			rl.beginTextureMode(buffer);
+			rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.orange);
+			rl.endTextureMode();
+		}
+	);
+
 	var grid = Grid(evenGrid(Grid2([1], [1, 1])));
 
 	grid.addWidgets([
-		Widget(
-			Area(Vector2(0, 0), Vector2(0, 0)),
-			Grid(evenGrid(Grid2([1], [1, 1])))
-			.addWidgets([
-				Widget(
-					Area(Vector2(0, 0), Vector2(0, 0)),
-					(() {
-						var scale = Animation(1, 0.2, ease);
-						var roundness = Animation(0, 0.2, ease);
-
-						return (buffer, renderContext) {
-							rl.beginTextureMode(buffer);
-
-							var area = renderContext.area.toRelative();
-							if (rl.getMousePosition().toTessera().isInside(renderContext.area) && rl.isCursorOnScreen()) {
-								scale.setValue(0.5);
-								roundness.setValue(0.5);
-							}
-							else {
-								scale.setValue(1);
-								roundness.setValue(0);
-							}
-
-							area.scale(scale.getValue());
-
-							rl.drawRectangleRounded(area.toRaylib(), roundness.getValue(), 5, rl.Color.yellow);
-							rl.endTextureMode();
-						};
-					})()
-				),
-				Widget(
-					Area(Vector2(0, 1), Vector2(0, 1)),
-				(buffer, renderContext) {
-						var dimensions = renderContext.area.getDimensions();
-
-						rl.beginTextureMode(buffer);
-						rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.red);
-						rl.endTextureMode();
-					}
-				),
-			]).render
-		),
-		Widget(
-			Area(Vector2(0, 1), Vector2(0, 1)),
-			(buffer, renderContext) {
-				var dimensions = renderContext.area.getDimensions();
-
-				rl.beginTextureMode(buffer);
-				rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.orange);
-				rl.endTextureMode();
-			}
-		),
+		(widget: idk1, area: Area(
+			Vector2(0, 0),
+			Vector2(0, 0)
+		)),
+		(widget: idk2, area: Area(
+			Vector2(0, 1),
+			Vector2(0, 1)
+		))
 	]);
 
 	var gridWidget = Widget(
-		Area.zero(),
 		grid.render,
 	);
 

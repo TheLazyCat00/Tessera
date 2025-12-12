@@ -1,15 +1,16 @@
 import 'package:tessera/tessera.dart';
 import 'package:raylib/raylib.dart' as rl;
 
+typedef GridWidgetContext = ({ Widget widget, Area<Cell> area });
 
 class Grid {
 	Grid2<SizeCallback> grid;
-	List<Widget> widgets = [];
+	List<GridWidgetContext> widgets = [];
 	Dimension2<Pixel> dimensions = Dimension2(0, 0);
 	Grid(this.grid);
 
-	Grid addWidgets(List<Widget> newWidgets) {
-		widgets.addAll(newWidgets);
+	Grid addWidgets(List<GridWidgetContext> widgets) {
+		this.widgets.addAll(widgets);
 
 		return this;
 	}
@@ -27,7 +28,7 @@ class Grid {
 
 
 		// Sort widgets by zIndex (lower zIndex rendered first, higher on top)
-		final sortedWidgets = [...widgets]..sort((a, b) => a.zIndex.compareTo(b.zIndex));
+		final sortedWidgets = [...widgets]..sort((a, b) => a.widget.zIndex.compareTo(b.widget.zIndex));
 
 		for (var widget in sortedWidgets) {
 			var topLeft = widget.area.topLeft.apply((cell, axis) {
@@ -39,7 +40,7 @@ class Grid {
 			});
 
 			var area = Area(topLeft, bottomRight);
-			var widgetBuffer = widget.renderCallback((
+			var widgetBuffer = widget.widget.renderCallback((
 				area: area
 			));
 

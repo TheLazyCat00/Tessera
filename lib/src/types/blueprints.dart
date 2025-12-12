@@ -85,14 +85,13 @@ class Border<T> {
 }
 
 class Widget {
-	Area<Cell> area;
 	late rl.RenderTexture2D Function(RenderContext) renderCallback;
 	int zIndex;
 
 	RenderContext? _prevRenderCallContext;
 	late rl.RenderTexture2D _buffer;
 
-	Widget(this.area, RenderCallback renderCallback, { this.zIndex = 0 }) {
+	Widget(RenderCallback renderCallback, { this.zIndex = 1 }) {
 		this.renderCallback = ((renderContext) {
 			if (_prevRenderCallContext != renderContext) {
 				_buffer = rl.loadRenderTexture(renderContext.area.getDimensions().x, renderContext.area.getDimensions().y);
