@@ -4,7 +4,7 @@ import 'dart:io';
 
 
 void renderWidget(Widget widget) {
-	Area<Pixel> area = Area(Vector2.zero(), Vector2(rl.getScreenWidth(), rl.getScreenHeight()));
+	Area<Pixels> area = Area(Vector2.zero(), Vector2(rl.getScreenWidth(), rl.getScreenHeight()));
 	var buffer = widget.renderCallback((area: area));
 
 	rl.beginDrawing();
@@ -12,7 +12,8 @@ void renderWidget(Widget widget) {
 	rl.endDrawing();
 }
 
-void drawBuffer(rl.RenderTexture2D buffer, Vector2<Pixel> position) {
+void drawBuffer(rl.RenderTexture2D buffer, Vector2<Pixels> position, { double rotation = 0, Vector2<Pixels>? origin }) {
+	origin ??= Vector2<Pixels>.zero();
 	final textureWidth = buffer.texture.width.toDouble();
 	final textureHeight = buffer.texture.height.toDouble();
 
@@ -23,7 +24,9 @@ void drawBuffer(rl.RenderTexture2D buffer, Vector2<Pixel> position) {
 		- textureHeight,
 	);
 
-	rl.drawTextureRec(buffer.texture, source, position.toRaylib(), rl.Color.white);
+
+	var dest = Area(position, position + Vector2(buffer.texture.width, buffer.texture.height));
+	rl.drawTexturePro(buffer.texture, source, dest.toRaylib(), origin.toRaylib(), rotation, rl.Color.white);
 }
 
 String getRaylibPath() {

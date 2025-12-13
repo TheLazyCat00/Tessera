@@ -1,22 +1,6 @@
 import 'package:tessera/tessera.dart';
 import 'package:raylib/raylib.dart' as rl hide Vector2;
 
-Grid2<SizeCallback> evenGrid(Grid2<int> grid) {
-	var proportional = grid.apply((element, axis) {
-		int sum = grid.getAxis(axis).fold<int>(0, (prev, current) => prev + current);
-
-		return element / sum;
-	});
-
-	SizeCallback getSizeGetter(double proportion, Axis2 axis) {
-		return (grid) => (grid.dimensions.getAxis(axis) * proportion).toInt();
-	}
-
-	var res = proportional.apply(getSizeGetter);
-
-	return res;
-}
-
 void main() {
 	rl.initLibrary(windows: getRaylibPath());
 	rl.initWindow(800, 600, "Hello Raylib!");
@@ -27,11 +11,11 @@ void main() {
 		var scale = Animation(1, 0.2, ease);
 		var roundness = Animation(0, 0.2, ease);
 
-		return (buffer, renderContext) {
+		return (buffer, RenderContext renderContext) {
 			rl.beginTextureMode(buffer);
 
 			var area = renderContext.area.toRelative();
-			if (rl.getMousePosition().toTessera().isInside(renderContext.area) && rl.isCursorOnScreen()) {
+			if (rl.getMousePosition().toTessera().toType<Pixels>().isInside(renderContext.area) && rl.isCursorOnScreen()) {
 				scale.setValue(0.5);
 				roundness.setValue(0.5);
 			}
@@ -68,13 +52,7 @@ void main() {
 	);
 
 	var idk2 = Widget(
-		(buffer, renderContext) {
-			var dimensions = renderContext.area.getDimensions();
-
-			rl.beginTextureMode(buffer);
-			rl.drawRectangle(0, 0, dimensions.x, dimensions.y, rl.Color.orange);
-			rl.endTextureMode();
-		}
+		Knob(rl.Color.darkGray, 1, 10).render
 	);
 
 	var grid = Grid(evenGrid(Grid2([1], [1, 1])));

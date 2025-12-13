@@ -5,12 +5,12 @@ import 'package:tessera/src/types.dart';
 
 typedef RenderCallback = void Function(rl.RenderTexture2D buffer, RenderContext renderContext);
 typedef RenderContext = ({
-	Area<Pixel> area,
+	Area<Pixels> area,
 });
 
-typedef SizeCallback = Pixel Function(SizeContext sizeContext);
+typedef SizeCallback = Pixels Function(SizeContext sizeContext);
 typedef SizeContext = ({
-	Dimension2<Pixel> dimensions
+	Dimension2<Pixels> dimensions
 });
 
 typedef AnimationFunc = double Function(double progressRatio);

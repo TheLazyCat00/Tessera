@@ -109,17 +109,20 @@ class Area<T extends num> {
 }
 
 extension RaylibVector2ToTesseraVector2 on rl.Vector2 {
-	Vector2 toTessera() => Vector2(x, y);
+	Vector2<double> toTessera() => Vector2(x.toDouble(), y.toDouble());
 }
 
 class Vector2<T extends num> {
 	final Map<Axis2, T> _data;
 
 	Vector2(T x, T y) : _data = { Axis2.x: x, Axis2.y: y };
+	Vector2.same(T value) : _data = { Axis2.x: value, Axis2.y: value };
 	Vector2.zero() : _data = { Axis2.x: 0 as T, Axis2.y: 0 as T };
 
 	T get x => _data[Axis2.x] as T;
 	T get y => _data[Axis2.y] as T;
+
+	Vector2<U> toType<U extends num>() => Vector2(convert<U>(x), convert<U>(y));
 
 	@override
 	bool operator ==(Object other) {
