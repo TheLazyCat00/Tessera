@@ -97,6 +97,7 @@ class Widget {
 				_buffer = rl.loadRenderTexture(renderContext.area.getDimensions().x, renderContext.area.getDimensions().y);
 			}
 
+			rl.setTextureFilter(_buffer.texture, rl.TextureFilter.bilinear);
 			rl.beginTextureMode(_buffer);
 			rl.clearBackground(rl.Color.rayWhite);
 			rl.endTextureMode();

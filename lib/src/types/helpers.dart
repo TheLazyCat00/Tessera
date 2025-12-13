@@ -81,13 +81,22 @@ class Area<T extends num> {
 
 	Dimension2<T> getDimensions() => bottomRight - topLeft;
 
-	void scale(double factor) {
+	Area<T> scale(double factor) {
 		var middlePoint = (topLeft + bottomRight) / 2;
 		var distance = middlePoint - topLeft;
 		distance = distance * factor;
 
 		topLeft = middlePoint - distance;
 		bottomRight = middlePoint + distance;
+		
+		return this;
+	}
+
+	Area<T> shift(Vector2<T> value) {
+		topLeft += value;
+		bottomRight += value;
+		
+		return this;
 	}
 
 	rl.Rectangle toRaylib() {
@@ -134,6 +143,9 @@ class Vector2<T extends num> {
 
 	@override
 	int get hashCode => Object.hash(x, y);
+
+	@override
+	String toString() => "($x, $y)";
 
 	rl.Vector2 toRaylib() => rl.Vector2(x.toDouble(), y.toDouble());
 

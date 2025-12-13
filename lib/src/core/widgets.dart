@@ -43,6 +43,7 @@ class Grid {
 			});
 
 			var area = Area(topLeft, bottomRight);
+			area.shift(renderContext.area.topLeft);
 			var widgetBuffer = widget.widget.renderCallback((
 				area: area
 			));
@@ -62,38 +63,19 @@ class Knob {
 	Degrees angleBetween;
 	bool isClicked = false;
 	late Widget face;
-	rl.Font font = rl.loadFont("C:/Windows/Fonts/arial.ttf");
 
-	Knob(this.color, this.minValue, this.maxValue, { this.angleBetween = 280 }) {
-		face = Widget((buffer, renderContext) {
-			var relativeArea = renderContext.area.toRelative();
-			rl.beginTextureMode(buffer);
-
-			var radius = min(relativeArea.bottomRight.x, relativeArea.bottomRight.y) ~/ 2;
-			rl.drawCircleV(
-				relativeArea.getCenter().toRaylib(),
-				radius.toDouble(),
-				color
-			);
-			var dimensions = Dimension2(radius ~/ 8, radius ~/ 2);
-			var position = relativeArea.getCenter() - Vector2(dimensions.x ~/ 2, radius);
-			rl.drawRectangleV(position.toRaylib(), dimensions.toRaylib(), rl.Color.black);
-			rl.endTextureMode();
-		});
-	}
+	Knob(this.color, this.minValue, this.maxValue, { this.angleBetween = 280 });
 
 	void render (rl.RenderTexture2D buffer, RenderContext renderContext) {
 		var relativeArea = renderContext.area.toRelative();
-		var center = relativeArea.getCenter();
 
 		var radius = min(relativeArea.bottomRight.x, relativeArea.bottomRight.y) ~/ 2;
-		var diameter = radius * 2;
-		var bottomRight = Vector2.same(diameter);
 
 		if (rl.isMouseButtonPressed(rl.MouseButton.left)) {
 			var mousePos = rl.getMousePosition().toTessera();
-			var dx = mousePos.x - renderContext.area.getCenter().x;
-			var dy = mousePos.y - renderContext.area.getCenter().y;
+			var center = renderContext.area.getCenter();
+			var dx = mousePos.x - center.x;
+			var dy = mousePos.y - center.y;
 			var distanceSquared = dx * dx + dy * dy;
 
 			bool mouseInside = distanceSquared <= radius * radius;
@@ -111,40 +93,44 @@ class Knob {
 			ratio = ratio.clamp(0, 1);
 		}
 
-		var face = this.face.renderCallback((area: Area(Vector2.zero(), bottomRight)));
-		rl.beginTextureMode(buffer);
-		var origin = bottomRight / 2;
+		var center = relativeArea.getCenter();
 		var rotation = - angleBetween / 2 + ratio * angleBetween;
-		drawBuffer(face, relativeArea.getCenter(), rotation: rotation, origin: origin);
 
+		rl.beginTextureMode(buffer);
+
+		rl.drawCircleV(
+			relativeArea.getCenter().toRaylib(),
+			radius.toDouble(),
+			color
+		);
+
+		var stickDimensions = Dimension2(radius ~/ 8, radius ~/ 2);
+		var position = relativeArea.getCenter() - Vector2(stickDimensions.x ~/ 2, radius);
+
+		rl.drawRectangleV(position.toRaylib(), stickDimensions.toRaylib(), rl.Color.black);
+		rl.drawRectanglePro(
+			Area(Vector2<Pixels>.zero(), stickDimensions).shift(center).toRaylib(),
+			Vector2(stickDimensions.x ~/ 2, radius).toRaylib(),
+			rotation,
+			rl.Color.red
+		);
+
+		var font = getGlobalFont();
 		var diff = maxValue - minValue;
-		int offset = 1;
-		String text = (minValue + diff * ratio).toStringAsFixed(1);
-		double fontSize = 30;
-		double spacing = 1;
+		var value = minValue + diff * ratio;
+		String text = value.toStringAsFixed(1);
+		double fontSize = 24;
+		double spacing = 0;
 
 		Dimension2<Pixels> dimensions = rl.measureTextEx(font, text, fontSize, spacing).toTessera().toType<Pixels>();
 
-		rl.drawTextPro(
+		rl.drawTextEx(
 			font,
 			text,
-			center.toRaylib(),
-			(dimensions / 2).toRaylib(),
-			0,
+			(center - dimensions / 2).toRaylib(),
 			fontSize,
 			spacing,
-			rl.Color.black,
-		);
-
-		rl.drawTextPro(
-			font,
-			text,
-			(center + Vector2.same(offset)).toRaylib(),
-			(dimensions / 2).toRaylib(),
-			0,
-			fontSize,
-			spacing,
-			rl.Color.white,
+			rl.Color.blue,
 		);
 
 		rl.endTextureMode();

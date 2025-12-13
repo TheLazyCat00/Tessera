@@ -1,11 +1,33 @@
 import 'package:tessera/tessera.dart';
-import 'package:raylib/raylib.dart' as rl hide Vector2;
+import 'package:raylib/raylib.dart' as rl;
+import 'package:raylib/src/modules/core/misc.dart' as rl;
+import 'package:raylib/src/modules/text/font.dart' as rl;
 
 void main() {
 	rl.initLibrary(windows: getRaylibPath());
-	rl.initWindow(800, 600, "Hello Raylib!");
-	rl.setWindowState(rl.ConfigFlags.windowResizable);
 
+	rl.setConfigFlags(rl.ConfigFlags.windowResizable | rl.ConfigFlags.msaa4xHint);
+
+	rl.initWindow(800, 600, "Hello Raylib!");
+
+	const int kMaxCodePoint = 512; 
+
+	final List<int> allChars = List<int>.generate(
+		kMaxCodePoint - 32, 
+		(index) => index + 32
+	);
+
+	var fontPath = "C:/Windows/Fonts/ShareTechMono-Regular.ttf";
+
+	final font = rl.loadFontEx(
+		fontPath,
+		100,
+		allChars,
+		allChars.length,
+	);
+
+	rl.setTextureFilter(font.texture, rl.TextureFilter.bilinear);
+	setGlobalFont(font);
 
 	var animationWidget = Widget((() {
 		var scale = Animation(1, 0.2, ease);
@@ -25,8 +47,8 @@ void main() {
 			}
 
 			area.scale(scale.getValue());
-
 			rl.drawRectangleRounded(area.toRaylib(), roundness.getValue(), 5, rl.Color.yellow);
+			rl.drawTextEx(getGlobalFont(), "hello", Vector2.zero().toRaylib(), 64, 1, rl.Color.red);
 			rl.endTextureMode();
 		};
 	})());
@@ -52,7 +74,15 @@ void main() {
 	);
 
 	var idk2 = Widget(
-		Knob(rl.Color.darkGray, 1, 10).render
+		Grid(evenGrid(Grid2([1, 1, 1], [1, 1, 1])))
+		.addWidgets([
+			(
+				area: Area(Vector2(1, 1), Vector2(1, 1)),
+				widget: Widget(
+					Knob(rl.Color.black, 1, 10).render
+				)
+			)
+		]).render
 	);
 
 	var grid = Grid(evenGrid(Grid2([1], [1, 1])));
@@ -73,7 +103,7 @@ void main() {
 	);
 
 	while (!rl.windowShouldClose()) {
-		renderWidget(gridWidget);
+		renderWidget(idk2);
 	}
 
 	rl.closeWindow();
